@@ -39,14 +39,20 @@ domainscompatible(a,b) = domain(a) == AnyDomain() || domain(b) == AnyDomain() ||
 #Check whether spaces are the same, override when you need to check parameters
 spacescompatible{D<:DomainSpace}(f::D,g::D)=domainscompatible(f,g) 
 spacescompatible(f,g)=false
+spacescompatible(f::AnySpace,g::AnySpace)=true
+spacescompatible(f::AnySpace,g)=true
+spacescompatible(f,g::AnySpace)=true
 ==(A::DomainSpace,B::DomainSpace)=spacescompatible(A,B)&&domain(A)==domain(B)
 
 
 # check a list of spaces for compatibility
 function spacescompatible{T<:FunctionSpace}(v::Vector{T})
-    for k=1:length(v)-1 
-        if !spacescompatible(v[k],v[k+1])
-            return false
+    #check all pairs are compatible
+    for i=1:length(v)
+        for j=(i+1):length(v) 
+            if !spacescompatible(v[i],v[j])
+                return false
+            end
         end
     end
     true
